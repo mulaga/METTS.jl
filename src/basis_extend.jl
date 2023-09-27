@@ -12,6 +12,21 @@ import ITensors: pause
 #    instead of H|psi>. Needed?
 #
 
+# Helper tensors for performing a partial direct sum
+function directsum_itensors(i::Index, j::Index, ij::Index)
+  S1 = zeros(dim(i), dim(ij))
+  for ii in 1:dim(i)
+    S1[ii, ii] = true
+  end
+  S2 = zeros(dim(j), dim(ij))
+  for jj in 1:dim(j)
+    S2[jj, dim(i) + jj] = true
+  end
+  D1 = itensor(S1, dag(i), ij)
+  D2 = itensor(S2, dag(j), ij)
+  return D1, D2
+end
+
 """
 Given an MPS psi and a collection of MPS phis,
 returns an MPS which is equal to psi
@@ -76,7 +91,7 @@ function extend(psi::MPS, phis::Vector{MPS}; kwargs...)
       else
         bx = Index(vcat(space(bψ), space(bϕ)), "bx_$(j-1)")
       end
-      D1, D2 = ITensors.directsum_itensors(bψ, bϕ, dag(bx))
+      D1, D2 = directsum_itensors(bψ, bϕ, dag(bx))
       Bx = D1 * B + D2 * Bphi
     else
       Bx = B

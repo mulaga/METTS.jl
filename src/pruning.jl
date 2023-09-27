@@ -1,5 +1,6 @@
 using Printf
 using TOML
+using PyPlot
 
 """ Performs a pruning analysis
 

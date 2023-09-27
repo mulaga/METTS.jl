@@ -64,6 +64,7 @@ function timeevo_tdvp(H::MPO, psi0::MPS, time::Number;
                         tau, svn, linkdim, t)
             end
         end
+        GC.gc()
     end
     if !isapprox(remainder, 0; rtol=1e-6, atol=1e-6)
         if maxlinkdim(psi) < maxm
@@ -91,6 +92,7 @@ function timeevo_tdvp(H::MPO, psi0::MPS, time::Number;
                         abs(remainder), svn, linkdim, t)
             end
         end
+        GC.gc()
     end
     
     return psi                
@@ -146,6 +148,7 @@ function timeevo_tdvp_extend(H::MPO, psi0::MPS, time::Number;
                     abs(times_init[isub]), svn, linkdim, t)
         end
     end
+    GC.gc()
     
     # Perform the bulk time evolution
     time_bulk = time - time_init
