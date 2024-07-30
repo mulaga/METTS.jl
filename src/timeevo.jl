@@ -40,10 +40,19 @@ function timeevo_tdvp(H::MPO, psi0::MPS, time::Number;
     for step in 1:n_steps        
         if maxlinkdim(psi) < maxm
             t = @elapsed begin
-                psi = tdvp(H, psi, time_tau / n_steps;
-                           nsweeps=1, nsite=2, cutoff=cutoff,
-                           maxdim=maxm, normalize=normalize,
-                           solver_backend=solver_backend, shift=shift)
+                # psi = tdvp(H, psi, time_tau / n_steps;
+                #            nsweeps=1, nsite=2, cutoff=cutoff,
+                #            maxdim=maxm, normalize=normalize,
+                #            solver_backend=solver_backend, shift=shift)
+
+                psi = tdvp(H, time_tau / n_steps, psi;
+                           updater_backend=solver_backend,
+                           nsweeps=1,
+                           nsite=2,
+                           cutoff=cutoff,
+                           maxdim=maxm,
+                           normalize=normalize)
+
             end
 
             svn = entropy_von_neumann(psi, N ÷ 2)
@@ -54,10 +63,17 @@ function timeevo_tdvp(H::MPO, psi0::MPS, time::Number;
             end
         else
             t = @elapsed begin
-                psi = tdvp(H, psi, time_tau / n_steps;
-                           nsweeps=1, nsite=1, cutoff=cutoff,
-                           maxdim=maxm, normalize=normalize,
-                           solver_backend=solver_backend, shift=shift)
+                # psi = tdvp(H, psi, time_tau / n_steps;
+                #            nsweeps=1, nsite=1, cutoff=cutoff,
+                #            maxdim=maxm, normalize=normalize,
+                #            solver_backend=solver_backend, shift=shift)
+                psi = tdvp(H, time_tau / n_steps, psi;
+                           updater_backend=solver_backend,
+                           nsweeps=1,
+                           nsite=1,
+                           cutoff=cutoff,
+                           maxdim=maxm,
+                           normalize=normalize)
             end
             svn = entropy_von_neumann(psi, N ÷ 2)
             linkdim = maxlinkdim(psi)
@@ -74,10 +90,18 @@ function timeevo_tdvp(H::MPO, psi0::MPS, time::Number;
     if !isapprox(remainder, 0; rtol=1e-6, atol=1e-6)
         if maxlinkdim(psi) < maxm
             t = @elapsed begin
-                psi = tdvp(H, psi, remainder;
-                           nsweeps=1, nsite=2, cutoff=cutoff,
-                           maxdim=maxm, normalize=normalize,
-                           solver_backend=solver_backend, shift=shift)
+                # psi = tdvp(H, psi, remainder;
+                #            nsweeps=1, nsite=2, cutoff=cutoff,
+                #            maxdim=maxm, normalize=normalize,
+                #            solver_backend=solver_backend, shift=shift)
+
+                psi = tdvp(H, remainder, psi;
+                           updater_backend=solver_backend,
+                           nsweeps=1,
+                           nsite=2,
+                           cutoff=cutoff,
+                           maxdim=maxm,
+                           normalize=normalize)
             end
             svn = entropy_von_neumann(psi, N ÷ 2)
             linkdim = maxlinkdim(psi)
@@ -87,10 +111,19 @@ function timeevo_tdvp(H::MPO, psi0::MPS, time::Number;
             end
         else
             t = @elapsed begin
-                psi = tdvp(H, psi, remainder;
-                           nsweeps=1, nsite=1, cutoff=cutoff,
-                           maxdim=maxm, normalize=normalize,
-                           solver_backend=solver_backend, shift=shift)
+                # psi = tdvp(H, psi, remainder;
+                #            nsweeps=1, nsite=1, cutoff=cutoff,
+                #            maxdim=maxm, normalize=normalize,
+                #            solver_backend=solver_backend, shift=shift)
+
+                
+                psi = tdvp(H, remainder, psi;
+                           updater_backend=solver_backend,
+                           nsweeps=1,
+                           nsite=1,
+                           cutoff=cutoff,
+                           maxdim=maxm,
+                           normalize=normalize)
             end
             if !silent
                 @printf("    1TDVP sweep, tau: %.5f, SvN: %.4f, maxm: %6d, time: %.5f secs\n",
@@ -144,10 +177,17 @@ function timeevo_tdvp_extend(H::MPO, psi0::MPS, time::Number;
                 l1, l2, t)
         end
         t = @elapsed begin
-            psi = tdvp(H, psi, times_init[isub];
-                       nsweeps=1, nsite=1, cutoff=1e-16,
-                       maxdim=maxm, normalize=normalize,
-                       solver_backend=solver_backend, shift=shift)
+            # psi = tdvp(H, psi, times_init[isub];
+            #            nsweeps=1, nsite=1, cutoff=1e-16,
+            #            maxdim=maxm, normalize=normalize,
+            #            solver_backend=solver_backend, shift=shift)
+            psi = tdvp(H, times_init[isub], psi;
+                       updater_backend=solver_backend,
+                       nsweeps=1,
+                       nsite=1,
+                       cutoff=cutoff,
+                       maxdim=maxm,
+                       normalize=normalize)
         end
 
         svn = entropy_von_neumann(psi, N ÷ 2)
