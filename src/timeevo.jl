@@ -60,6 +60,7 @@ function timeevo_tdvp(H::MPO, psi0::MPS, time::Number;
             if !silent
                 @printf("    2TDVP sweep, tau: %.5f, SvN: %.4f, maxm: %6d, time: %.5f secs\n",
                         tau, svn, linkdim, t)
+                flush(stdout)
             end
         else
             t = @elapsed begin
@@ -80,6 +81,7 @@ function timeevo_tdvp(H::MPO, psi0::MPS, time::Number;
             if !silent
                 @printf("    1TDVP sweep, tau: %.5f, SvN: %.4f, maxm: %6d, time: %.5f secs\n",
                         tau, svn, linkdim, t)
+                flush(stdout)
             end
         end
 
@@ -108,6 +110,7 @@ function timeevo_tdvp(H::MPO, psi0::MPS, time::Number;
             if !silent
                 @printf("    2TDVP sweep, tau: %.5f, SvN: %.4f, maxm: %6d, time: %.5f secs\n",
                         abs(remainder), svn, linkdim, t)
+                flush(stdout)
             end
         else
             t = @elapsed begin
@@ -128,6 +131,7 @@ function timeevo_tdvp(H::MPO, psi0::MPS, time::Number;
             if !silent
                 @printf("    1TDVP sweep, tau: %.5f, SvN: %.4f, maxm: %6d, time: %.5f secs\n",
                         abs(remainder), svn, linkdim, t)
+                flush(stdout)
             end
         end
 
@@ -168,8 +172,12 @@ function timeevo_tdvp_extend(H::MPO, psi0::MPS, time::Number;
     for isub in 1:nsubdiv
         l1 = maxlinkdim(psi)
         t = @elapsed begin
+            println("before basis_extend")
+            flush(stdout)
             psi = basis_extend(psi, H; extension_krylovdim=kkrylov,
                                extension_cutoff=1e-12)
+            println("after basis_extend")
+            flush(stdout)
         end
         l2 = maxlinkdim(psi)
         if !silent
@@ -195,6 +203,7 @@ function timeevo_tdvp_extend(H::MPO, psi0::MPS, time::Number;
         if !silent
             @printf("    1TDVP sweep, tau: %.5f, SvN: %.4f, maxm: %6d, time: %.5f secs\n",
                     abs(times_init[isub]), svn, linkdim, t)
+            flush(stdout)
         end
     end
     GC.gc()
