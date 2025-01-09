@@ -128,6 +128,8 @@ function timeevo_tdvp(H::MPO, psi0::MPS, time::Number;
                            maxdim=maxm,
                            normalize=normalize)
             end
+            svn = entropy_von_neumann(psi, N ÷ 2)
+            linkdim = maxlinkdim(psi)
             if !silent
                 @printf("    1TDVP sweep, tau: %.5f, SvN: %.4f, maxm: %6d, time: %.5f secs\n",
                         abs(remainder), svn, linkdim, t)
