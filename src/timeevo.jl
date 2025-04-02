@@ -57,6 +57,8 @@ function timeevo_2tdvp(H::MPO, psi0::MPS, time::Number;
             end        
         GC.gc()
 
+        end
+
     end
     if !isapprox(remainder, 0; rtol=1e-6, atol=1e-6)
         t = @elapsed begin
