@@ -22,6 +22,74 @@ function entropy_von_neumann(psi::MPS, b::Int)
 end
 
 """
+Basic time evolution using 2TDVP
+"""
+function timeevo_2tdvp(H::MPO, psi0::MPS, time::Number;
+                      tau::Number=0.1, cutoff::Float64=1e-6,
+                      maxm::Int64=1000, normalize::Bool=true,
+                      silent=false, solver_backend::AbstractString="applyexp",
+                      shift::Real = 0.)
+    N = length(psi0)
+    n_steps, remainder, time_tau = n_steps_remainder(time, tau)
+    psi = copy(psi0)
+
+    for step in 1:n_steps        
+        t = @elapsed begin
+            # psi = tdvp(H, psi, time_tau / n_steps;
+            #            nsweeps=1, nsite=2, cutoff=cutoff,
+            #            maxdim=maxm, normalize=normalize,
+            #            solver_backend=solver_backend, shift=shift)
+
+            psi = tdvp(H, time_tau / n_steps, psi;
+                        updater_backend=solver_backend,
+                        nsweeps=1,
+                        nsite=2,
+                        cutoff=cutoff,
+                        maxdim=maxm,
+                        normalize=normalize)
+
+            svn = entropy_von_neumann(psi, N ÷ 2)
+            linkdim = maxlinkdim(psi)
+            if !silent
+                @printf("    2TDVP sweep, tau: %.5f, SvN: %.4f, maxm: %6d, time: %.5f secs\n",
+                        tau, svn, linkdim, t)
+                flush(stdout)
+            end        
+        GC.gc()
+
+    end
+    if !isapprox(remainder, 0; rtol=1e-6, atol=1e-6)
+        t = @elapsed begin
+            # psi = tdvp(H, psi, remainder;
+            #            nsweeps=1, nsite=1, cutoff=cutoff,
+            #            maxdim=maxm, normalize=normalize,
+            #            solver_backend=solver_backend, shift=shift)
+
+            
+            psi = tdvp(H, remainder, psi;
+                        updater_backend=solver_backend,
+                        nsweeps=1,
+                        nsite=2,
+                        cutoff=cutoff,
+                        maxdim=maxm,
+                        normalize=normalize)
+        end
+        svn = entropy_von_neumann(psi, N ÷ 2)
+        linkdim = maxlinkdim(psi)
+        if !silent
+            @printf("    1TDVP sweep, tau: %.5f, SvN: %.4f, maxm: %6d, time: %.5f secs\n",
+                    abs(remainder), svn, linkdim, t)
+            flush(stdout)
+        end
+
+        GC.gc()
+    end
+    
+    return psi
+end
+
+
+"""
 Basic time evolution using TDVP
 
 starting out with 2TDVP until a maximal bond dimension is achieved
