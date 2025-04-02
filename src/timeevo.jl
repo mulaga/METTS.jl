@@ -47,17 +47,16 @@ function timeevo_2tdvp(H::MPO, psi0::MPS, time::Number;
                         cutoff=cutoff,
                         maxdim=maxm,
                         normalize=normalize)
-
-            svn = entropy_von_neumann(psi, N ÷ 2)
-            linkdim = maxlinkdim(psi)
-            if !silent
-                @printf("    2TDVP sweep, tau: %.5f, SvN: %.4f, maxm: %6d, time: %.5f secs\n",
-                        tau, svn, linkdim, t)
-                flush(stdout)
-            end        
-        GC.gc()
-
         end
+
+        svn = entropy_von_neumann(psi, N ÷ 2)
+        linkdim = maxlinkdim(psi)
+        if !silent
+            @printf("    2TDVP sweep, tau: %.5f, SvN: %.4f, maxm: %6d, time: %.5f secs\n",
+                    tau, svn, linkdim, t)
+            flush(stdout)
+        end        
+        GC.gc()
 
     end
     if !isapprox(remainder, 0; rtol=1e-6, atol=1e-6)
